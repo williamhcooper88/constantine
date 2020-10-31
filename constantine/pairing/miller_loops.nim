@@ -26,7 +26,7 @@ template basicMillerLoop*[FT, F1, F2](
        T: var ECP_ShortW_Proj[F2, OnTwist],
        line: var Line[F2],
        P: ECP_ShortW_Aff[F1, NotOnTwist],
-       Q: ECP_ShortW_Aff[F2, OnTwist],
+       Q, nQ: ECP_ShortW_Aff[F2, OnTwist],
        param: untyped,
        param_isNeg: untyped
     ) =
@@ -35,10 +35,6 @@ template basicMillerLoop*[FT, F1, F2](
     doAssert FT.C == F1.C
     doAssert FT.C == F2.C
 
-  var nQ{.noInit.}: typeof(Q)
-
-  projectiveFromAffine(T, Q)
-  neg(nQ, Q)
   setOne(f)
 
   template u: untyped = pairing(C, param)
@@ -46,7 +42,6 @@ template basicMillerLoop*[FT, F1, F2](
   for i in countdown(u3.bits - 2, 1):
     square(f)
     line_double(line, T, P)
-
     mul(f, line)
 
     let naf = bit(u3, i).int8 - bit(u, i).int8 # This can throw exception
